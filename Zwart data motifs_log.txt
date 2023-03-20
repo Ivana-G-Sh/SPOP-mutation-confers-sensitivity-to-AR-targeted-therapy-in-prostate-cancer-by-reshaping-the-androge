@@ -1,0 +1,303 @@
+
+
+Zwart data: motifs
+
+Usage:   bedtools multiinter [OPTIONS] -i FILE1 FILE2 .. FILEn
+	 Requires that each interval file is sorted by chrom/start. 
+
+
+1) manipulation of MACS output files
+
+its macs output so I have to remove first row, last 2 columns and all the modified files are saved as m_
+
+cut -f1,2,3 wz1100.txt | sed 1d > m_wz1100.txt
+
+sorting: 
+sort -k1,1 -k2,2n in.bed > in.sorted.bed
+
+(bioinfo) MAC202969:SPOPmut ivana$ wc -l m_wz1264.txt
+    1954 m_wz1264.txt
+(bioinfo) MAC202969:SPOPmut ivana$ wc -l  m_wz1206.txt
+   14256 m_wz1206.txt
+(bioinfo) MAC202969:SPOPmut ivana$ wc -l m_wz1100.txt
+    7717 m_wz1100.txt
+(bioinfo) MAC202969:SPOPmut ivana$ wc -l m_wz1073.txt
+   18038 m_wz1073.txt
+
+ 2) Concataneting and merging the bed files:
+
+ Group 1: SPOPmut, CHD1del
+
+#Prvo konkataniras sve bed fajlove - i sortiras i onda bedtools merge
+cat m_wz1073.txt m_wz1100.txt m_wz1206.txt m_wz1264.txt > SPOPmut_cat.bed
+sort -k1,1 -k2,2n SPOPmut_cat.bed > SPOPmut.sorted.bed
+
+bedtools merge -i SPOPmut.sorted.bed > SPOPmut.bed
+
+(bioinfo) MAC202969:SPOPmut ivana$ bedtools merge -i SPOPmut.sorted.bed > SPOPmut.bed
+Error: line number 41965 of file SPOPmut.sorted.bed has 5 fields, but 3 were expected.
+
+sed 41965d SPOPmut.sorted.bed > tmp1
+(bioinfo) MAC202969:SPOPmut ivana$ sed 41965d SPOPmut.sorted.bed > tmp1
+(bioinfo) MAC202969:SPOPmut ivana$ tail tmp1
+Y	22854739	22855289
+Y	22854808	22855258
+Y	22854838	22855040
+Y	22854855	22855255
+Y	23091905	23092305
+
+
+bedtools merge -i tmp1 > SPOPmut.bed
+
+(bioinfo) MAC202969:SPOPmut ivana$ wc -l SPOPmut.bed
+   23618 SPOPmut.bed
+
+Group 4: Other SPOPwt CHD1del tumors, ERG low, PTEN wt
+
+gunzip *.gz
+
+sa mv renajmela tako da ostane samo wz
+cat *.txt.bed | sort -k1,1 -k2,2n > Group4_cat.bed
+(bioinfo) MAC202969:Group4 ivana$ wc -l Group4_cat.bed
+   37766 Group4_cat.bed
+
+bedtools merge -i Group4_cat.bed > Group4.bed  
+(bioinfo) MAC202969:Group4 ivana$ wc -l Group4.bed
+   25418 Group4.bed
+
+Group5: Other SPOPwt tumors, CHD1wt, ERG low, PTEN wt
+gunzip *.gz
+
+for f in *.txt
+ do
+     cut -f1,2,3 $f | sed 1d >`basename $f`.bed
+ done
+
+cat *.txt.bed | sort -k1,1 -k2,2n > Group5_cat.bed
+(bioinfo) MAC202969:Group5 ivana$ wc -l Group5_cat.bed
+  117813 Group5_cat.bed
+
+bedtools merge -i Group5_cat.bed > Group5.bed  
+(bioinfo) MAC202969:Group5 ivana$ wc -l Group5.bed
+   32199 Group5.bed
+
+
+
+Group8 ERGhigh: Group8: Only ERGhigh (SPOPwt)	
+cat *.txt.bed | sort -k1,1 -k2,2n > Group8_cat.bed
+
+
+(bioinfo) MAC202969:Group8 ivana$ wc -l Group8_cat.bed
+  196097 Group8_cat.bed
+
+bedtools merge -i Group8_cat.bed > Group8.bed
+
+
+
+####
+WHAT IS INCLUDED IN THE FINAL PLOT ARE:
+Group 1: SPOPmut.bed
+Group 4: Other SPOPwt CHD1del tumors, ERG low, PTEN wt
+Group 5: Other SPOPwt tumors, CHD1wt, ERG low, PTEN wt
+Group 8: ERGhigh: Group8: Only ERGhigh (SPOPwt)
+
+
+
+3) compare the incidence of motif in AR peaks for merged bed files within separate groups:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Incidence of FOXA1~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Volumes/Seagate/Zwart_data
+
+SPOPmut
+PATH=$PATH:/Users/Ivana/bin/
+
+annotatepeaks.pl SPOPmut.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known1.motif > FOXA1_SPOPmut.bed 
+
+Error - because in the bed file chromosomes are marked as 1 instead of chr1
+
+there is a way to fix it in excell and also with code - in AAcomputational change chromosome names
+
+awk '{print "chr"$0}' SPOPmut.bed > tmp1
+
+
+Group4
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl Group4.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known1.motif > FOXA1_Group4.bed
+
+Group5
+awk '{print "chr"$0}' Group5.bed > tmp1
+rm Group5
+mv tmp1 Group5.bed
+
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl Group5.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known1.motif > FOXA1_Group5.bed
+
+PinMutantvsControl/knownResults/known1.motif > FOXA1_Group7.bed
+
+Group8
+awk '{print "chr"$0}' Group8.bed > tmp1
+mv tmp1 Group8.bed
+(bioinfo) MAC202969:Group8 ivana$ wc -l Group8.bed
+   45704 Group8.bed
+
+annotatepeaks.pl Group8.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known1.motif > FOXA1_Group8.bed
+
+Lets move all the annotated files to folder FoxA1
+
+Priredi u Excelu i onda copy paste u Prism
+sredi linije i tockice, min i maximum i smooth line
+cut minimum x axis on min value bc otherwise it looks wierd
+
+####
+WHAT IS INCLUDED IN THE FINAL PLOT ARE:
+Group 1: SPOPmut.bed
+Group 4: Other SPOPwt CHD1del tumors, ERG low, PTEN wt
+Group 5: Other SPOPwt tumors, CHD1wt, ERG low, PTEN wt
+Group 8: ERGhigh: Group8: Only ERGhigh (SPOPwt)
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Incidence of HoxB13~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+annotatepeaks.pl SPOPmut.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known26.motif > HoxB13_SPOPmut.bed 
+annotatepeaks.pl Group4.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known26.motif > HoxB13_Group4.bed
+annotatepeaks.pl Group5.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known26.motif > HoxB13_Group5.bed
+annotatepeaks.pl Group8.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known26.motif > HoxB13_Group8.bed
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Incidence of AREs~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ARE - known motif 20
+ /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known20.motif
+
+
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl SPOPmut.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known20.motif > ARE_SPOPmut.bed 
+
+cd ../Group4
+annotatepeaks.pl Group4.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known20.motif > ARE_Group4.bed 
+
+cd ../Group5
+annotatepeaks.pl Group5.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known20.motif > ARE_Group5.bed 
+
+cd ../Group8
+annotatepeaks.pl Group8.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/UPinMutantvsControl/knownResults/known20.motif > ARE_Group8.bed 
+
+0.003085978
+0.000111588
+##########################################################################################################################################################################################################################################
+#Again with new metadata info - Deli updated for FOXA1 mutation status and Cul3 mutation status
+
+1) PREPARE MERGED BED FILES
+
+For each group:
+Here is the example of Group1
+
+gunzip *.txt.gz
+
+for f in *.txt
+ do
+     cut -f1,2,3 $f | sed 1d >`basename $f`.bed
+ done
+
+cat *.txt.bed | sort -k1,1 -k2,2n > Group8_cat.bed
+
+
+source activate bioinfo
+
+bedtools merge -i Group8_cat.bed > Group8.bed
+
+wc -l Group8.bed
+
+27600 Group1.bed
+32783 Group4.bed
+32207 Group5.bed
+61611 Group8.bed
+
+awk '{print "chr"$0}' Group8.bed > tmp1
+rm Group8.bed
+mv tmp1 ERG.bed
+
+Group1: SPOPmut bed
+Group4: CHD1del.bed
+Group5: CHD1wt.bed
+Group8: Erg.bed
+
+1a) visualize these merged bed files with Intervene and proportional Venn diagras just to get the feeling
+
+cd /Volumes/Seagate/Zwart_data/Groups_new
+
+(bioinfo) MAC202969:Groups_new ivana$ ls
+CHD1del.bed   ERG.bed     Group4      Group8      Motif_distance
+CHD1wt.bed    Group1      Group5      Motif_Occurrence  SPOPmut.bed
+
+intervene venn -i SPOPmut.bed CHD1del.bed CHD1wt.bed ERG.bed --save-overlaps --output ALL_Venn --figtype pdf --names=SPOPmut,SPOPwt_CHD1del,SPOPwt_CHD1wt,SPOPwt_ERGhigh
+
+I tried to do in R but the code for interesction of 4 datasets is very complicated and in addition the output is not proportional - I tried with VennDiagram :()
+probat cu UpSet:
+
+intervene upset -i SPOPmut.bed CHD1del.bed CHD1wt.bed ERG.bed --save-overlaps --output UpSet_ALL_Venn --figtype pdf --names=SPOPmut,SPOPwt_CHD1del,SPOPwt_CHD1wt,SPOPwt_ERGhigh
+
+isto ruzno
+intervene pairwise -i SPOPmut.bed CHD1del.bed CHD1wt.bed ERG.bed --names=SPOPmut,SPOPwt_CHD1del,SPOPwt_CHD1wt,SPOPwt_ERGhigh --compute frac --htype tribar
+
+*
+
+or pairwise
+
+2) RUN MOTIF FREQUENCY ANALYSIS
+
+/Volumes/Seagate/Zwart_data/Groups_new
+
+bioinfo) MAC202969:Groups_new ivana$ ls
+CHD1del.bed	CHD1wt.bed	ERG.bed		Group1		Group4		Group5		Group8		SPOPmut.bed
+
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl SPOPmut.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif > FOXA1_SPOPmut.bed 
+annotatepeaks.pl CHD1wt.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif > FOXA1_CHD1wt.bed 
+annotatepeaks.pl CHD1del.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif > FOXA1_CHD1del.bed 
+annotatepeaks.pl ERG.bed /Users/ivana//data/genomes/hg19/ -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif > FOXA1_ERG.bed
+
+Plots in Prism - ne izgleda tako impresivno kao prije za SPOP!!!!
+
+3) RUN MOTIF DISTANCE ANALYSIS
+
+Foxa1
+
+annotatepeaks.pl SPOPmut.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif -mdist> FOXA1_dist_SPOPmut.txt 
+annotatepeaks.pl CHD1wt.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif -mdist> CHD1wt.bed_dist_SPOPmut.txt 
+annotatepeaks.pl CHD1del.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif -mdist> CHD1del.bed_dist_SPOPmut.txt
+annotatepeaks.pl ERG.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif -mdist> ERG.bed_dist_SPOPmut.txt
+
+Plots in RStudio - RMD file
+
+HoxB13
+known26.motif
+HOXB13(Homeobox)/ProstateTumor-HOXB13-ChIP-Seq(GSE56288)/Homer
+
+cd /Volumes/Seagate/Zwart_data/Groups_new/Motif_distance
+
+PATH=$PATH:/Users/Ivana/bin/
+
+annotatepeaks.pl SPOPmut.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known26.motif -mdist> HOXB13_dist_SPOPmut.txt 
+annotatepeaks.pl CHD1wt.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known26.motif -mdist> HOXB13_dist_CHD1wt.txt
+annotatepeaks.pl CHD1del.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known26.motif -mdist> HOXB13_dist_CHD1del.txt
+annotatepeaks.pl ERG.bed /Users/ivana//data/genomes/hg19/ -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known26.motif -mdist> HOXB13_dist_ERG.txt
+
+
+################################Simplified analysis******************************
+
+#Uzmi stare grupe definirane kao ERG low, PTEN wild-type, FOXA1wt
+I samo izanaliziraj njih tje prikazi njih
+
+cd /Volumes/Seagate/Zwart_data/Groups_old
+
+1) proporcionalni Venn dijagram
+Group 1: SPOPmut, CHD1del
+Group 4: Other SPOPwt CHD1del tumors, ERG low, PTEN wt
+
+intervene venn -i SPOPmut.bed Group4.bed --save-overlaps --output SPOPmut_wt__Venn --figtype pdf --names=SPOPmut,SPOPwt
+
+proportional VennDiagram in R
+
+2) samo u starom Prism fajlu za motif distance makni ostale uzorke (ERG high...)
+
+3) Sina plot samo redo
+
+4) stacked barplot showing number of the samples

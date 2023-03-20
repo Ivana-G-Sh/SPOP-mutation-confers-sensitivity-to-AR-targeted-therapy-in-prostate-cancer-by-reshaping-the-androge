@@ -1,0 +1,10 @@
+Vizualising RNA-seq data with Genome Browser
+
+#you need to have bam and bai file
+#upload to amazon S3
+#make both bam and bai public
+#to upload to Genome Broser you just need top show the url of the bam file, not the bam and bai
+track type=bam name="My BAM" bigDataUrl=http://myorg.edu/mylab/my.sorted.bam
+track type=bam name="13_S1.sorted.bam.sgAR;SPOPmutant (EtOH)" bigDataUrl=https://androgenreceptorchip.s3.us-east-2.amazonaws.com/13_S1.sorted.bam
+
+under options (side bar next tot he track) : tick next to the Desplay data as a densitygraph and there choose smoothing window 13 pixels (depends)

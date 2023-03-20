@@ -1,0 +1,278 @@
+
+**integration of AR and H3K4me2 data**
+
+
+###1) create bed file with intersected peaks
+###Control cells
+
+bedtools intersect  -a AR_UP_Control.bed -b H3K4me2_Control_DHT/4_Control_H3K4me2.txt -wb > AR_UP_Control_4_H3K4me2_Control_DHT.txt
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ wc -l AR_UP_Control_4_H3K4me2_Control_DHT.txt
+    5883 AR_UP_Control_4_H3K4me2_Control_DHT.txt
+
+bedtools intersect  -a AR_UP_Control.bed -b H3K4me2_Control_DHT/5_Control_H3K4me2.txt -wb > AR_UP_Control_5_H3K4me2_Control_DHT.txt
+
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ wc -l AR_UP_Control_5_H3K4me2_Control_DHT.txt
+    5579 AR_UP_Control_5_H3K4me2_Control_DHT.txt
+
+bedtools intersect  -a AR_UP_Control.bed -b H3K4me2_Control_DHT/6_Control_H3K4me2.txt -wb > AR_UP_Control_6_H3K4me2_Control_DHT.txt
+    5670 AR_UP_Control_6_H3K4me2_Control_DHT.txt
+
+
+###SPOPmutant
+
+bedtools intersect -a AR_UP_SPOPmut.bed -b H3K4me2_SPOPmut_DHT/16_SPOPmut_DHT_H3K4me2.txt -wb > AR_UP_SPOPmut_16_H3K4me2_SPOPm_DHT.txt
+
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ wc -l  AR_UP_SPOPmut_16_H3K4me2_SPOPm_DHT.txt
+    5207 AR_UP_SPOPmut_16_H3K4me2_SPOPm_DHT.txt
+
+
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ head AR_UP_SPOPmut_16_H3K4me2_SPOPm_DHT.txt
+chr1	6188071	6189487	.	chr1	6187818	6191825
+chr1	6190557	6191018	.	chr1	6187818	6191825
+chr1	6287494	6287541	.	chr1	6287494	6287770
+chr1	6287754	6287770	.	chr1	6287494	6287770
+chr1	6288010	6288210	.	chr1	6288010	6288210
+chr1	6288275	6288438	.	chr1	6288275	6288913
+chr1	6289644	6289833	.	chr1	6289320	6289833
+chr1	6290000	6290159	.	chr1	6290000	6290222
+chr1	6306593	6306599	.	chr1	6306300	6306599
+chr1	6307057	6307243	.	chr1	6307057	6307645
+
+
+dakle kolone 5-7 su zapravo peakovi od H3K4me2 koji se poklapaju sa AR peakovima
+
+Onda te kolone trebam zacuvati a ostale baciti
+
+bedtools intersect -a AR_UP_SPOPmut.bed -b H3K4me2_SPOPmut_DHT/18_SPOPmut_H3K4me2.txt -wb > AR_UP_SPOPmut_18_H3K4me2_SPOPm_DHT.txt
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ wc -l AR_UP_SPOPmut_18_H3K4me2_SPOPm_DHT.txt
+    5663 AR_UP_SPOPmut_18_H3K4me2_SPOPm_DHT.txt
+
+bedtools intersect -a AR_UP_SPOPmut.bed -b H3K4me2_SPOPmut_DHT/19_SPOPmut_DHT_H3K4me2.txt -wb > AR_UP_SPOPmut_19_H3K4me2_SPOPm_DHT.txt
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ wc -l AR_UP_SPOPmut_19_H3K4me2_SPOPm_DHT.txt
+    5323 AR_UP_SPOPmut_19_H3K4me2_SPOPm_DHT.txt
+
+ pogledaj jedan output:
+u excellu izbrisala kolone ise jvala kao intersect-4....
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+e sada kako dobiti velicinu peakova - sa awk
+
+dakle zelim intersect peakove od AR koji su specificni za mutantu sa H3K4me2 peakovima i to od Encode pipeline jer je mm10 dok je moja analiza mm9  no uzet metapodatke od peakova tj velicinu peaka i onda pretraziti motive u top 50% peaks
+
+
+NAME_peaks.narrowPeak is BED6+4 format file which contains the peak locations together with peak summit, pvalue and qvalue. You can load it to UCSC genome browser. Definition of some specific columns are:
+
+5th: integer score for display calculated as int(-10*log10qvalue). Please note that currently this value might be out of the [0-1000] range defined in UCSC Encode narrowPeak format
+7th: fold-change
+8th: -log10pvalue
+9th: -log10qvalue
+10th: relative summit position to peak start
+The file can be loaded directly to UCSC genome browser. Remove the beginning track line if you want to analyze it by other tools.
+
+
+
+bedtools intersect -a UP_SPOPmut.bed.txt -b H3K4me2_SPOPmut_DHT.txt -wb | awk -v OFS="\t" '{print $1, $2, $3, $4, $5, $6, $7, $8}' >out
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ head out
+chr1	6188071	6189487	.	chr1	6187373	6190759	Peak_12769
+chr1	6190557	6190759	.	chr1	6187373	6190759	Peak_12769
+chr1	6190836	6191018	.	chr1	6190836	6191936	Peak_35561
+chr1	6287498	6287541	.	chr1	6287498	6288196	Peak_40177
+chr1	6287177	6287244	.	chr1	6287049	6287244	Peak_73460
+chr1	6287754	6288196	.	chr1	6287498	6288196	Peak_40177
+chr1	6288283	6288438	.	chr1	6288283	6288921	Peak_45894
+chr1	6289644	6290159	.	chr1	6289192	6290575	Peak_37828
+chr1	6306593	6306814	.	chr1	6306318	6306814	Peak_49395
+chr1	6306908	6307243	.	chr1	6306908	6307945	Peak_40178
+
+dakle isprintao mi je prve cetri kolone od UP_SPOPmut.bed.txt i onda 3 kolone od H3K4me2_SPOPmut_DHT.txt
+
+bedtools intersect -a UP_SPOPmut.bed.txt -b H3K4me2_SPOPmut_DHT.txt -wb | awk -v OFS="\t" '{print $1, $2, $3, $4, $5, $6, $7, $8, $9, $19, $11, $12, $13, $14}' >out2
+
+mv out2 AR_UP_SPOPmut_H3K4me2_SPOPmut_DHT.txt
+ 5161 AR_UP_SPOPmut_H3K4me2_SPOPmut_DHT.txt
+
+Yupiiii
+bedtools intersect -a UP_Control.bed.txt -b H3K4me2_Control_DHT.txt -wb | awk -v OFS="\t" '{print $1, $2, $3, $4, $5, $6, $7, $8, $9, $19, $11, $12, $13, $14}' > UP_Control_H3K4me2_Control_DHT.txt
+
+(bioinfo) MAC202969:integration_H3K4me2 ivana$ wc -l UP_Control_H3K4me2_Control_DHT.txt
+    5435 UP_Control_H3K4me2_Control_DHT.txt
+
+    5435/2=2718
+
+sortirala i sad aimma dvije opcije - svi peakovi ili top 50% peakova
+
+svi peakovi (all_overlap_peaks):
+
+cd /Volumes/Seagate/AR_2019/integration_H3K4me2/all_overlap_peaks/Control
+
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl AR_UP_Control_H3K4me2_Control_DHT_all.txt mm10 -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif  > FOXA1_incidence_UP_Control_H3K4me2_Control_DHT.bed 
+
+cd /Volumes/Seagate/AR_2019/integration_H3K4me2/all_overlap_peaks/SPOPmut
+
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl AR_UP_SPOPmut_H3K4me2_SPOPmut_all.txt mm10 -size 1000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif  > FOXA1_incidence_UP_SPOPmut_H3K4me2_SPOPmut_DHT.txt
+
+
+it looks wierd - like a flat line
+because average size of the peak is 2.4 kb
+
+so lets put a size of 4kb
+
+cd /Volumes/Seagate/AR_2019/integration_H3K4me2/all_overlap_peaks/Control
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl AR_UP_Control_H3K4me2_Control_DHT_all.txt mm10 -size 4000 -hist 10 -m /Volumes/Seagate/AR_2019/HOMER_Differential_peaks/MOTIFS/UPinMutantvsControl/knownResults/known1.motif  > FOXA1_incidence_4kb_UP_Control_H3K4me2_Control_DHT.bed 
+
+
+~~~~output od Diffbind na H3K4me2
+
+Sto bi se desilo kad bi runnali analizu samo na diferencijalnim peakovima of H3K4me2 koji su Up nakon tretmana sa DHT 
+onda bi mogla usporediti FOXA1 motif occurence before and after the treatment
+
+dakle motiv je u:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif 
+
+cd /Volumes/Seagate/AR_2019/integration_H3K4me2/H3K4me2peaks_DiffBind
+
+(bioinfo) MAC202969:H3K4me2peaks_DiffBind ivana$ ls
+SPOPmut_UP_DHT.txt	SPOPmut_UP_EtOH.txt	UP_Control_DHT.txt	UP_Control_EtOH.txt
+
+ajmo prvo peaks koji su upregulirani u SPOPmut DHT vs EtOH 
+ajmo prvo peaks koji su upregulirani u Control DHT vs EtOH
+takodjer isto sa SPOPmutantom
+
+dakle motiv je u:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif 
+
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10 -size 1000 -hist 10 -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif > FOXA1_incidence_UP_SPOPmut_H3K4me2_DHT.txt
+
+again flat line kao brdo - opet dobivam isto - na nije to posljedica toga da mi peakovi nisu dobro razluceni  j da us kao brezuljci - kaze Mike da tako treba biti no da bud eljepse prikazat cu kao:
+
+ili jedino da splotam kao histogram - broj motiva po peak
+
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+annotatepeaks.pl SPOPmut_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+annotatepeaks.pl UP_Control_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_UP_Control_DHT_H3K4me2.txt
+annotatepeaks.pl UP_Control_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_UP_Control_EtOH_H3K4me2.txt
+
+NO trebali smo normalizirati broj motiva po velici peaka jer ako je peak veci normalno da ima vise motiva - tako da broj motiva po peaku trebam normalizirati sa velicinom peaka tj podijeliti broj motiva sa apsolutnom vrijednosti velicine peaka
+
+
+~~~~isto za AR
+cd /Volumes/Seagate/AR_2019/integration_H3K4me2/H3K4me2peaks_DiffBind
+
+ /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif
+
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+annotatepeaks.pl SPOPmut_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+annotatepeaks.pl UP_Control_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_UP_Control_DHT_H3K4me2.txt
+annotatepeaks.pl UP_Control_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_UP_Control_EtOH_H3K4me2.txt
+
+normalizacija - podijeli broj motiva sa apsolutnim vrijednostima velicine peaka
+
+
+HoxB13
+cd /Volumes/Seagate/AR_2019/integration_H3K4me2/H3K4me2peaks_DiffBind
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif
+
+
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > N_peakova_Hox_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+annotatepeaks.pl SPOPmut_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > N_peakova_Hox_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+
+annotatepeaks.pl UP_Control_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > N_peakova_Hox_incidence_UP_Control_DHT_H3K4me2.txt
+
+annotatepeaks.pl UP_Control_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > N_peakova_Hox_incidence_UP_Control_EtOH_H3K4me2.txt
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SHIT - prijasnji peakovi su sadrzavali promotore i enhancere - nisam selektirala za enhancere!!! - ne zgleda tak dobro
+
+ponovno
+
+cd /Volumes/Seagate/AR_2019/integration_H3K4me2/H3K4me2peaks_DiffBind
+
+Annotated_Control_DHT_only_consensus_NoProm_No5UTR.txt 
+
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl Annotated_Control_DHT_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_Control_DHT_H3K4me2.txt
+annotatepeaks.pl Annotated_Control_EtOH_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_Control_EtOH_H3K4me2.txt
+annotatepeaks.pl Annotated_SPOPm_DHT_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_SPOPm_DHT_H3K4me2.txt
+annotatepeaks.pl Annotated_SPOPm_EtOH_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > N_peakova_FOXA1_incidence_SPOPm_EtOH_H3K4me2.txt
+
+
+
+
+annotatepeaks.pl Annotated_Control_DHT_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_Control_DHT_H3K4me2.txt
+annotatepeaks.pl Annotated_Control_EtOH_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_Control_EtOH_H3K4me2.txt
+annotatepeaks.pl Annotated_SPOPm_DHT_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_SPOPm_DHT_H3K4me2.txt
+annotatepeaks.pl Annotated_SPOPm_EtOH_only_consensus_NoProm_No5UTR.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > N_peakova_ARE_incidence_SPOPm_EtOH_H3K4me2.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

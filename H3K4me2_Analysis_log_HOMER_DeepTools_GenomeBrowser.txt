@@ -1,0 +1,702 @@
+##NEW ANALYSIS H3K4ME2-MM10 ENCODE
+
+##Anotation of H3K4me2 peaks
+##Control _ EtOH vs DHT
+
+S obzirom da sam vidjlea prije da se H3K4me2 cluster EtOH1 i DHT1 nekako drugacije izbacila sam ih iz analize
+analizirani su 2 i3 te 5 i 6
+za 2:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/H3K4me2_Control_EtOH/c7159e4e-86f7-45e8-a37a-d7958969c676/call-bwa/shard-1/execution/2_S2_L008_R1_001.merged.bam 
+
+
+inputi - pripadajuci: 8 i 9 te 11 i 12 samo sam ih preimenovala
+
+NarrowPeaks: (base) MAC202969:~ ivana$ /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/H3K4me2_Control_EtOH/c7159e4e-86f7-45e8-a37a-d7958969c676/call-macs2/shard-1/execution/2_S2_L008_R1_001.merged.nodup_x_ctl_for_rep2.pval0.01.500K.narrowPeak 
+
+for SPOPmut were 13, 14 16 i 18 te za input 21, 22, 23 i 26 - samo sam preimenovala
+Izgleda da Diffbind vise voli kad su svi fajlovi jednostavno napisani
+
+~~~~~~~~~~~~~~~~~~~
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Control_DHTvsETOH
+
+izanalizirani su oni sa FDR od 1%
+
+118 peakova je UP u EtOH
+267 peakova je UP nakon DHT tretmana
+
+PATH=$PATH:/Users/Ivana/bin/
+
+annotatePeaks.pl Control_UP_DHT.txt mm10 -go GO_Control_UP_DHT -genomeOntology genome_Control_UP_DHT -annStats Stats_Control_UP_DHT > Annotated_Control_UP_DHT.txt
+annotatePeaks.pl Control_UP_EtOH.txt mm10 -go GO_Control_UP_EtOH -genomeOntology genome_Control_UP_EtOH -annStats Stats_Control_UP_EtOH > Annotated_Control_UP_EtOH.txt
+~~~~~~~~~~~~~~~~~~~
+SPOPmut
+
+826 in EtOH
+1523 up in dht
+
+SPOPmut_UP_DHT.txt
+
+annotatePeaks.pl SPOPmut_UP_EtOH.txt mm10 -go GO_SPOPmut_UP_EtOH -genomeOntology genome_SPOPmut_UP_EtOH -annStats Stats_SPOPmut_UP_EtOH > Annotated_SPOPmut_UP_EtOH.txt
+annotatePeaks.pl SPOPmut_UP_DHT.txt mm10 -go GO_SPOPmut_UP_DHT -genomeOntology genome_SPOPmut_UP_DHT -annStats Stats_SPOPmut_UP_DHT > Annotated_SPOPmut_UP_DHT.txt
+
+#CEAS online
+#16_S16_L008_R1_001.merged.nodup.pooled_x_23_S21_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig	
+#SPOPmut_UP_DHT.txt
+
+#13_S13_L008_R1_001.merged.nodup.pooled_x_21_S19_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig	
+#SPOPmut_UP_EtOH.txt
+
+#4_S4_L008_R1_001.merged.nodup.pooled_x_10_S10_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig	
+#Control_UP_DHT.txt
+
+#1_S1_L008_R1_001.merged.nodup.pooled_x_7_S7_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig	
+#Control_UP_EtOH.txt
+
+
+
+
+~~~~~~~~Enriched TF motifs for differential H3K4me2 peaks in 10 nM DHT condition
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/SPOP_ETOHvsDHT
+
+#1) I have to remove the promoter regions
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Control_DHTvsETOH
+
+cat Annotated_Control_UP_DHT.txt |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' >  Annotated_Control_UP_DHT_NoProm_No5UTR.txt
+cut -f 2,3,4,5  Annotated_Control_UP_DHT_NoProm_No5UTR.txt > tmp
+sed 1d tmp | sort -k1,1 -k2,2n > Control_UP_DHT_enhancers.txt
+rm tmp
+
+cat Annotated_Control_UP_EtOH.txt |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' >  Annotated_Control_UP_EtOH_NoProm_No5UTR.txt
+cut -f 2,3,4,5  Annotated_Control_UP_EtOH_NoProm_No5UTR.txt > tmp
+sed 1d tmp | sort -k1,1 -k2,2n > Control_UP_EtOH_enhancers.txt
+rm tmp
+
+cp Control_UP_DHT_enhancers.txt /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Homer
+cp Control_UP_EtOH_enhancers.txt /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Homer
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/SPOP_ETOHvsDHT
+
+cat Annotated_SPOPmut_UP_EtOH.txt |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' > Annotated_SPOPmut_UP_EtOH_NoProm_No5UTR.txt
+(bioinfo) MAC202969:SPOP_ETOHvsDHT ivana$ cat Annotated_SPOPmut_UP_EtOH_NoProm_No5UTR.txt | grep -c "promoter"
+0
+
+cut -f 2,3,4,5  Annotated_SPOPmut_UP_EtOH_NoProm_No5UTR.txt > tmp
+sed 1d tmp | sort -k1,1 -k2,2n > SPOPmut_UP_EtOH_enhancers.txt
+rm tmp
+
+cat Annotated_SPOPmut_UP_DHT.txt |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' > Annotated_SPOPmut_UP_DHT_NoProm_No5UTR.txt
+head Annotated_SPOPmut_UP_DHT_NoProm_No5UTR.txt
+cut -f 2,3,4,5  Annotated_SPOPmut_UP_DHT_NoProm_No5UTR.txt > tmp
+sed 1d tmp | sort -k1,1 -k2,2n > SPOPmut_UP_DHT_enhancers.txt
+rm tmp
+
+cp SPOPmut_UP_DHT_enhancers.txt  /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Homer
+cp SPOPmut_UP_EtOH_enhancers.txt /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Homer
+
+
+
+#2) motif analysis
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Homer
+
+
+findMotifsGenome.pl Control_UP_DHT_enhancers.txt mm10 Enr_control_DHT_vs_EtOH -bg Control_UP_EtOH_enhancers.txt  -size given -h
+findMotifsGenome.pl SPOPmut_UP_DHT_enhancers.txt mm10 Enr_SPOPmut_DHT_vs_EtOH -bg SPOPmut_UP_EtOH_enhancers.txt  -size given -h
+
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Homer2
+PATH=$PATH:/Users/Ivana/bin/
+findMotifsGenome.pl Control_UP_DHT_enhancers.txt mm10 Enr_control_DHT_vs_EtOH -bg Control_UP_EtOH_enhancers.txt  -size 100 -h #izgleda gore
+findMotifsGenome.pl SPOPmut_UP_DHT_enhancers.txt mm10 Enr_SPOPmut_DHT_vs_EtOH -bg SPOPmut_UP_EtOH_enhancers.txt  -size 100 -h
+
+wc -l Control_UP_DHT_enhancers.txt 266
+Control_UP_EtOH_enhancers.txt 118
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Incidence of FoxaA1, HoxB13, ARE & FOXA1:ARE motifs in enriched H3K4me2 peaks upon AR stimulation (final figure in the paper)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sto bi se desilo kad bi runnali analizu samo na diferencijalnim enhancerima of H3K4me2 koji su Up nakon tretmana sa DHT 
+onda bi mogla usporediti FOXA1 motif occurence before and after the treatment
+
+dakle motiv je u:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif 
+
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/motif_frequency
+
+
+
+dakle motiv je u:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif 
+
+PATH=$PATH:/Users/Ivana/bin/
+
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > FOXA1_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+annotatepeaks.pl SPOPmut_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > FOXA1_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+annotatepeaks.pl Control_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > FOXA1_incidence_Control_UP_DHT_H3K4me2.txt
+annotatepeaks.pl Control_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known22.motif -nmotifs > FOXA1_incidence_Control_UP_EtOH_H3K4me2.txt
+
+#ako je peak veci normalno da ima vise motiva - tako da broj motiva po peaku treba normalizirati sa velicinom peaka tj podijeliti broj motiva sa apsolutnom vrijednosti velicine peaka
+
+August 2019 - samo uzela ima li motiv ili ne
+
+cut -f22 FOXA1_incidence_SPOPmut_UP_DHT_H3K4me2.txt > short_FOXA1_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+cut -f22 FOXA1_incidence_SPOPmut_UP_EtOH_H3K4me2.txt > short_FOXA1_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+cut -f22 FOXA1_incidence_Control_UP_DHT_H3K4me2.txt > short_FOXA1_incidence_Control_UP_DHT_H3K4me2.txt
+cut -f22 FOXA1_incidence_Control_UP_EtOH_H3K4me2.txt > short_FOXA1_incidence_Control_UP_EtOH_H3K4me2.txt
+
+NAJBOLJI REZULTAT: 
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/motif_frequency/Plot\ FOXA1\ FOXA1\:AR\ and\ AR.pdf 
+
+
+ /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif
+
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > ARE_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+annotatepeaks.pl SPOPmut_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > ARE_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+annotatepeaks.pl Control_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > ARE_incidence_Control_UP_DHT_H3K4me2.txt
+annotatepeaks.pl Control_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/DiffBind/Control_EtOH_DHT/motifs_enhancers_Ctrl_DHT_vs_EtOH/knownResults/known2.motif -nmotifs > ARE_incidence_Control_UP_EtOH_H3K4me2.txt
+
+normalizacija - podijeli broj motiva sa apsolutnim vrijednostima velicine peaka u R
+
+August 2019 - samo uzela ima li motiv ili ne
+
+cut -f22 ARE_incidence_SPOPmut_UP_DHT_H3K4me2.txt > short_ARE_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+cut -f22 ARE_incidence_SPOPmut_UP_EtOH_H3K4me2.txt > short_ARE_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+cut -f22 ARE_incidence_Control_UP_DHT_H3K4me2.txt > short_ARE_incidence_Control_UP_DHT_H3K4me2.txt
+cut -f22 ARE_incidence_Control_UP_EtOH_H3K4me2.txt > short_ARE_incidence_Control_UP_EtOH_H3K4me2.txt
+
+
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif
+
+
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > Hox_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+annotatepeaks.pl SPOPmut_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > Hox_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+
+annotatepeaks.pl Control_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > Hox_incidence_Control_UP_DHT_H3K4me2.txt
+annotatepeaks.pl Control_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Ivana6661_2018_11_15/HOMER/MOTIF_ANALYSIS/ENHANCERS_ONLY/SPOPmut_DHT_Control_DHT/knownResults/known60.motif -nmotifs > Hox_incidence_Control_UP_EtOH_H3K4me2.txt
+
+analiza u Rmd file
+napravila drugi tip analize - stacked barplot
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/motif_frequency 
+
+
+August 2019
+annotatepeaks.pl SPOPmut_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known322.motif -nmotifs > FOXA1.AR_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+Peaks=1523
+annotatepeaks.pl SPOPmut_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known322.motif -nmotifs > FOXA1.AR_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+Peaks=826
+annotatepeaks.pl Control_UP_DHT.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known322.motif -nmotifs > FOXA1.AR_incidence_Control_UP_DHT_H3K4me2.txt
+annotatepeaks.pl Control_UP_EtOH.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known322.motif -nmotifs > FOXA1.AR_incidence_Control_UP_EtOH_H3K4me2.txt
+
+
+cut -f22 FOXA1.AR_incidence_SPOPmut_UP_DHT_H3K4me2.txt > short_FOXA1.AR_incidence_SPOPmut_UP_DHT_H3K4me2.txt
+cut -f22 FOXA1.AR_incidence_SPOPmut_UP_EtOH_H3K4me2.txt > short_FOXA1.AR_incidence_SPOPmut_UP_EtOH_H3K4me2.txt
+cut -f22 FOXA1.AR_incidence_Control_UP_DHT_H3K4me2.txt > short_FOXA1.AR_incidence_Control_UP_DHT_H3K4me2.txt
+cut -f22 FOXA1.AR_incidence_Control_UP_EtOH_H3K4me2.txt > short_FOXA1.AR_incidence_Control_UP_EtOH_H3K4me2.txt
+
+
+~~~~~~~~~~~R file is in:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/motif_frequency/Barplot_August.R 
+
+
+~~~~~~~~~~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!in the paper!!!!!!!!!!!!!!!!!!
+~~~~~~~~~~FIGURE: /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/motif_frequency/Rplot_motif_frequency_DHT_November.pdf 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~histogram (krivo)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#coverage near AR motifs
+#date: May 2019
+
+(bioinfo) MAC202969:Histogram ivana$ pwd
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Histogram
+
+Files:
+Annotated_Control_UP_DHT_NoProm_No5UTR.txt	Annotated_Control_UP_EtOH_NoProm_No5UTR.txt	Annotated_SPOPmut_UP_DHT_NoProm_No5UTR.txt	Annotated_SPOPmut_UP_EtOH_NoProm_No5UTR.txt
+
+I sada anotirati samo sa motivima za ARE - to imam od ovog stacked barplota
+Onda otvorim u excellu i profiltriram samo one peakove koji imaju motiv, a one koji imaju nulu izbacila - sve sortirala u excellu jer mi je lakse i sejvala kao MS-DOS paper
+
+http://deeptools.ie-freiburg.mpg.de/
+
+Odvojeno compute matrix za Control i odvojeno za SPOPmut
+
+http://deeptools.ie-freiburg.mpg.de/
+
+Upload Files mm10
+
+deepTools
+computeMatrix
+
+trebaju ti i bigwigs: iz macs-pooled foldera i oni sluze kao Score files
+
+computeMatrix odvojeno za Control i odvojeno za SPOP mut
+
+#computeMatrix
+nput Parameter	Value	Note for rerun
+Regions to plot	79: ARE_Control_UP_EtOH.txt	
+Regions to plot	78: ARE_Control_UP_DHT.txt	
+Sample order matters	Yes	
+Score file	80: 1_S1_L008_R1_001.merged.nodup.pooled_x_7_S7_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig	
+Score file	81: 4_S4_L008_R1_001.merged.nodup.pooled_x_10_S10_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig	
+computeMatrix has two main output options	reference-point	
+The reference point for the plotting	center of region	
+Discard any values after the region end	False	
+Distance upstream of the start site of the regions defined in the region file	3000	
+Distance downstream of the end site of the given regions	3000	
+Show advanced output settings	no	
+Show advanced options	no
+
+
+#PLOT heatmap
+http://deeptools.ie-freiburg.mpg.de/?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fbgruening%2Fdeeptools_plot_heatmap%2Fdeeptools_plot_heatmap%2F3.1.2.0.1&version=3.1.2.0.1&__identifer=p1295vw1mt
+
+Matrix file from the computeMatrix tool	82: computeMatrix on data 81, data 80, and others: Matrix	
+Show advanced output settings	yes	
+Image file format	eps	
+Image dpi	300	
+Save the matrix of values underlying the heatmap	True	
+Save the regions after skipping zeros or min/max threshold values	False	
+Show advanced options	yes	
+Sort regions	descending order	
+Method used for sorting	mean	
+Type of statistic that should be plotted in the summary image above the heatmap	mean	
+Missing data color	black	
+Alpha channel (transparency)	1.0	
+List of colors for each heatmap. Separate lists by spaces and the colors in the list by comas	Empty.	
+Minimum value for the heatmap intensities	Empty.	
+Maximum value for the heatmap intensities	Empty.	
+Minimum value for the Y-axis of the summary plot. Leave empty for automatic values	Not available.	
+Maximum value for Y-axis of the summary plot. Leave empty for automatic values	Not available.	
+The x-axis label	Empty.	
+The y-axis label for the top panel	Empty.	
+Heatmap width in cm	7.5	
+Heatmap height in cm	25.0	
+What to show	summary plot, heatmap and colorbar	
+Label for the region start	Empty.	
+Label for the region end	Empty.	
+Reference point label	ARE	
+Labels for the samples (each bigwig) plotted	Empty.	
+Labels for the regions plotted in the heatmap	Empty.	
+Title of the plot	Empty.	
+Rotation of the X-axis labels (in degrees)	0	
+Make one plot per group of regions	False	
+Did you compute the matrix with more than one groups of regions?	yes	
+Dataset peek
+#ARE_Control_UP_EtOH_txt_0.bed:9	ARE_Control_UP_DHT_txt_1.bed:115
+#downstream:[3000, 3000]	upstream:[3000, 3000]	body:[0, 0]	bin size:[10, 10]	unscaled 5 prime:[0, 0]	unscaled 3 prime:[0, 0]
+ARE_Control_UP_EtOH_txt_0.bed:9	ARE_Control_UP_DHT_txt_1.bed:115	1_S1_L008_R1_001.merged.nodup.pooled_x_7_S7_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig_0	1_S1_L008_R1_001.merged.nodup.pooled_x_7_S7_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig_0	1
+
+#ne izgleda bas kao prije - ne sijecam se sto sam bila napravila
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Homer: SPOPmut vs EtOH DHT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 2019
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Control_vs_SPOPmut_DHT/Results
+
+see Rmd file
+
+> sum(chip_DS$Fold<0) #less than 0 are the ones enriched in SPOPmut
+[1] 10708
+> sum(chip_DS$Fold>0)
+[1] 11734
+
+
+(bioinfo) MAC202969:Results ivana$ wc -l Control_enriched.bed
+   16117 Control_enriched.bed
+
+(bioinfo) MAC202969:Results ivana$ wc -l SPOPmut_enriched.bed
+   15272 SPOPmut_enriched.bed
+
+Resulting bed files are in:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Control_vs_SPOPmut_DHT/Results
+
+Bed files need to be sorted
+
+sort -V -k1,1 -k2,2 Control_enriched.bed > sorted_Control_enriched.bed
+(bioinfo) MAC202969:Results ivana$ head sorted_Control_enriched.bed
+
+sort -V -k1,1 -k2,2 SPOPmut_enriched.bed > sorted_SPOPmut_enriched.bed
+
+
+Annotate to remove the promoters and TSS
+
+PATH=$PATH:/Users/Ivana/bin/
+
+annotatePeaks.pl sorted_Control_enriched.bed mm10 -go GO_sorted_Control_enriched.bed -genomeOntology genome_sorted_Control_enriched.bed -annStats Stats_sorted_Control_enriched.bed > Annotated_sorted_Control_enriched.bed
+
+annotatePeaks.pl sorted_SPOPmut_enriched.bed mm10 -go GO_sorted_SPOPmut_enriched.bed -genomeOntology genome_sorted_SPOPmut_enriched.bed -annStats Stats_sorted_SPOPmut_enriched.bed > Annotated_sorted_SPOPmut_enriched.bed
+
+cat Annotated_sorted_Control_enriched.bed |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' > tmp 
+cut -f 2,3,4,5  tmp > tmp1
+sed 1d tmp1 | sort -k1,1 -k2,2n > Control_enriched_DHT_enhancers.txt
+rm tm*
+
+(bioinfo) MAC202969:Results ivana$ wc -l Control_enriched_DHT_enhancers.txt
+   14154 Control_enriched_DHT_enhancers.txt
+
+cat Annotated_sorted_SPOPmut_enriched.bed |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' > tmp 
+cut -f 2,3,4,5  tmp > tmp1
+sed 1d tmp1 | sort -k1,1 -k2,2n > SPOPmut_enriched_DHT_enhancers.txt
+rm tm*
+
+(bioinfo) MAC202969:Results ivana$ wc -l SPOPmut_enriched_DHT_enhancers.txt
+   14638 SPOPmut_enriched_DHT_enhancers.txt
+
+
+now perform Homer motif analysis
+
+PATH=$PATH:/Users/Ivana/bin/
+findMotifsGenome.pl SPOPmut_enriched_DHT_enhancers.txt mm10 homer_SPOPmut_vs_Ctrl_DHT -bg Control_enriched_DHT_enhancers.txt  -size given -h
+findMotifsGenome.pl Control_enriched_DHT_enhancers.txt mm10  homer_Ctrl_vs_SPOPmut_DHT -bg SPOPmut_enriched_DHT_enhancers.txt  -size given -h
+
+#Isto nije bas spektakularno i ne mogu plotati ovo
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Enriched TF motifs for Ctrl_DHT specific and SPOPmut_specific peaks~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Control_vs_SPOPmut_DHT/Results
+(base) MAC202969:Results ivana$ wc -l Control_enriched.bed
+   16117 Control_enriched.bed
+(base) MAC202969:Results ivana$ wc -l Control_enriched_DHT_enhancers.txt
+   14154 Control_enriched_DHT_enhancers.txt #ovo je file
+
+
+(base) MAC202969:Results ivana$ wc -l SPOPmut_enriched.bed
+   15272 SPOPmut_enriched.bed
+(base) MAC202969:Results ivana$ wc -l SPOPmut_enriched_DHT_enhancers.txt
+   14638 SPOPmut_enriched_DHT_enhancers.txt #ovo je file
+
+(base) MAC202969:Results ivana$ mkdir motif_presence
+
+~~~~~~~~ARE
+PATH=$PATH:/Users/Ivana/bin/
+annotatepeaks.pl Control_enriched_DHT_enhancers.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known219.motif -nmotifs > motif_presence/ARE_Control_enriched_DHT_enhancers.txt
+annotatepeaks.pl SPOPmut_enriched_DHT_enhancers.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known219.motif -nmotifs > motif_presence/ARE_SPOPmut_enriched_DHT_enhancers.txt
+
+~~~~~~~~FOXA1
+annotatepeaks.pl Control_enriched_DHT_enhancers.txt mm10  -m  /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known28.motif  -nmotifs > motif_presence/FOXA1_Control_enriched_DHT_enhancers.txt
+annotatepeaks.pl SPOPmut_enriched_DHT_enhancers.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known28.motif  -nmotifs > motif_presence/FOXA1_SPOPmut_enriched_DHT_enhancers.txt
+
+
+~~~~~~~FOXA1:AR
+annotatepeaks.pl Control_enriched_DHT_enhancers.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known322.motif  -nmotifs > FOXA1.AR_Control_enriched_DHT_enhancers.txt
+annotatepeaks.pl SPOPmut_enriched_DHT_enhancers.txt mm10  -m /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/homer/SPOP_vs_Control_DHT/knownResults/known322.motif  -nmotifs > FOXA1.AR_CSPOPmut_enriched_DHT_enhancers.txt
+
+
+cd motif_presence
+
+cut -f2,3,4,22 ARE_Control_enriched_DHT_enhancers.txt > short_ARE_Control_enriched_DHT_enhancers.txt
+cut -f2,3,4,22 ARE_SPOPmut_enriched_DHT_enhancers.txt > short_ARE_SPOPmut_enriched_DHT_enhancers.txt
+cut -f2,3,4,22 FOXA1_Control_enriched_DHT_enhancers.txt > short_FOXA1_Control_enriched_DHT_enhancers.txt
+cut -f2,3,4,22 FOXA1_SPOPmut_enriched_DHT_enhancers.txt > short_FOXA1_SPOPmut_enriched_DHT_enhancers.txt
+cut -f2,3,4,22 FOXA1.AR_CSPOPmut_enriched_DHT_enhancers.txt > short_FOXA1.AR_CSPOPmut_enriched_DHT_enhancers.txt
+cut -f2,3,4,22  FOXA1.AR_Control_enriched_DHT_enhancers.txt > short_ FOXA1.AR_Control_enriched_DHT_enhancers.txt
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DiffBind/Control_vs_SPOPmut_DHT/Results/motif_presence/motif_presence.Rproj
+
+#Basically there is only difference for FOXA1 motif but not for the others
+
+~~~~~~~~~~~~~~~~~~~~~~~~Genome Browser mm10~~~~~~~~~~~~~~~
+add H3K4me2 bigwigs:
+
+bilo bi bolje da su p value bigwigs
+
+H3K4me2_Control_DHT:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline/H3K4me2_Control_DHT/c50aeb12-8f47-40dc-a1dd-0bc798e84992/call-macs2_pooled/execution/4_S4_L008_R1_001.merged.nodup.pooled_x_10_S10_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig
+https://s3.amazonaws.com/histonechip/4_S4_L008_R1_001.merged.nodup.pooled_x_10_S10_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig
+
+H3K4me2_Control_EtOH:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline/H3K4me2_Control_EtOH/c7159e4e-86f7-45e8-a37a-d7958969c676/call-macs2_pooled/execution/1_S1_L008_R1_001.merged.nodup.pooled_x_7_S7_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig 
+https://s3.amazonaws.com/histonechip/1_S1_L008_R1_001.merged.nodup.pooled_x_7_S7_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig
+
+H3K4me2_SPOPmut_DHT:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline/H3K4me2_SPOPmut_DHT/20f8fd21-ce35-4052-b56d-ff7e9059fb37/call-macs2_pooled/execution/16_S16_L008_R1_001.merged.nodup.pooled_x_23_S21_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig 
+https://s3.amazonaws.com/histonechip/16_S16_L008_R1_001.merged.nodup.pooled_x_23_S21_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig
+
+H3K4me2_SPOPmut_EtOH:
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline/H3K4me2_SPOPmut_EtOH/ebea0b49-4d9c-471a-b899-f0233d85db35/call-macs2_pooled/execution/13_S13_L008_R1_001.merged.nodup.pooled_x_21_S19_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig 
+
+https://s3.amazonaws.com/histonechip/13_S13_L008_R1_001.merged.nodup.pooled_x_21_S19_L008_R1_001.merged.nodup.pooled.fc.signal.bigwig
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~look at H3K4me2 signal across AR SPOPmut eniched and depleted peaks~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/signal_at_AR_enhancers 
+
+bed files from AR peaks are in: /Volumes/Seagate/AR_2019/HOMER_Differential_peaks
+(deeptools) MAC202969:HOMER_Differential_peaks ivana$ wc -l UP_Control.txt
+    5807 UP_Control.txt
+(deeptools) MAC202969:HOMER_Differential_peaks ivana$ wc -l UP_SPOPmut.txt
+    7789 UP_SPOPmut.txt
+
+#bigwigs: I need a signal actually only in DHT condition but lets as a control place EtOH signal as well
+#in macs2 pooled/executions etc - samo sam prekopirala u ovaj folder
+#(deeptools) MAC202969:Encode_pipeline_mm10 ivana$ cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10
+#(deeptools) MAC202969:Encode_pipeline_mm10 ivana$ ls
+
+H3K4me2_Control_DHT.bigwig		
+H3K4me2_Control_EtOH.bigwig
+H3K4me2_SPOPmut_EtOH.bigwig
+H3K4me2_SPOPmut_DHT.bigwig
+
+
+ Plot profile
+ #TRY1 - 1.5 KB
+ #TRY2 - 2 KB
+ #TRY3 - 3 KB
+
+computeMatrix reference-point \
+-S H3K4me2_Control_DHT.bigwig	H3K4me2_Control_EtOH.bigwig	H3K4me2_SPOPmut_EtOH.bigwig  H3K4me2_SPOPmut_DHT.bigwig \
+-R Control_enriched.bed SPOPmut_enriched.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 3000 -b 3000 \
+--missingDataAsZero \
+-out try3.tab.gz \
+--verbose 
+
+ plotProfile -m  try3.tab.gz \
+ -out Profile_up_genes_Carver_ALL_enhancers.pdf \
+ --perGroup \
+ --plotTitle "H3K4me2_signal_at_ARv3" 
+
+ #what if I take just the bed files with AREs and enhancer regions
+
+ #here are already annotated files for AR chip 
+ cd /Volumes/Seagate/AR_2019/Homer_ARE_Anno/Control/Anno_ARE_Control.txt 
+ cd  /Volumes/Seagate/AR_2019/Homer_ARE_Anno/Control
+
+ cat Anno_ARE_Control.txt |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' | cut -f 2,3,4,5 | sed 1d | sort -k1,1 -k2,2n > Annotated_ARE_AR_UP_Ctrl_DHT_NoProm_No5UTR.bed 
+(base) MAC202969:Control ivana$ wc -l Annotated_ARE_AR_UP_Ctrl_DHT_NoProm_No5UTR.bed 
+    4095 Annotated_ARE_AR_UP_Ctrl_DHT_NoProm_No5UTR.bed
+
+
+cd /Volumes/Seagate/AR_2019/Homer_ARE_Anno/SPOPmut
+
+
+cat Anno_ARE_SPOPmut.txt	 |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' | cut -f 2,3,4,5 | sed 1d | sort -k1,1 -k2,2n > Annotated_ARE_AR_UP_SPOPmut_DHT_NoProm_No5UTR.bed 
+    4095 Annotated_ARE_AR_UP_SPOPmut_DHT_NoProm_No5UTR.bed
+
+
+
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10
+computeMatrix reference-point \
+-S H3K4me2_Control_DHT.bigwig H3K4me2_Control_EtOH.bigwig H3K4me2_SPOPmut_EtOH.bigwig  H3K4me2_SPOPmut_DHT.bigwig \
+-R Annotated_ARE_AR_UP_Ctrl_DHT_NoProm_No5UTR.bed Annotated_ARE_AR_UP_SPOPmut_DHT_NoProm_No5UTR.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 1500 -b 1500 \
+--missingDataAsZero \
+-out try4.tab.gz \
+--verbose 
+
+ plotProfile -m  try4.tab.gz \
+ -out Profile_up_genes_Carver_ALL_enhancers.v2.pdf \
+ --perGroup \
+ --plotTitle "H3K4me2_signal_at_AR" 
+
+ #break it into two plots
+computeMatrix reference-point \
+-S H3K4me2_Control_DHT.bigwig H3K4me2_Control_EtOH.bigwig \
+-R Annotated_ARE_AR_UP_Ctrl_DHT_NoProm_No5UTR.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 1500 -b 1500 \
+--missingDataAsZero \
+-out try5.tab.gz \
+--verbose 
+
+ plotProfile -m  try5.tab.gz \
+ -out Control_H3K4me2_signal_at_AR_enhancers.v5.pdf \
+ --perGroup \
+ --averageType mean \
+ --colors orange blue \
+ --yMin 1.8 \
+ --yMax 4.6 \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+  plotProfile -m  try5.tab.gz \
+ -out Control_H3K4me2_signal_at_AR_enhancers.v6.pdf \
+ --perGroup \
+ --averageType median \
+ --colors orange blue \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+computeMatrix reference-point \
+-S H3K4me2_SPOPmut_EtOH.bigwig  H3K4me2_SPOPmut_DHT.bigwig \
+-R Annotated_ARE_AR_UP_SPOPmut_DHT_NoProm_No5UTR.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 1500 -b 1500 \
+--missingDataAsZero \
+-out try6.tab.gz \
+--verbose 
+
+ plotProfile -m  try6.tab.gz \
+ -out SPOPmut_H3K4me2_signal_at_AR_enhancers.v4.pdf \
+ --perGroup \
+ --colors green red \
+ --yMin 1.8 \
+ --yMax 4.6 \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+
+ plotProfile -m  try6.tab.gz \
+ -out SPOPmut_H3K4me2_signal_at_AR_enhancers.v5.pdf \
+ --perGroup \
+ --colors green red \
+ --averageType median \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+~~~~~~~~sto ako umjesto tih bigwigs uzmem p value bigwigs - da li su rezultati bolji
+1.pval.signal.bigwig					
+13.pval.signal.bigwig			
+16.pval.signal.bigwig
+4.pval.signal.bigwig
+
+computeMatrix reference-point \
+-S 4.pval.signal.bigwig 1.pval.signal.bigwig \
+-R Annotated_ARE_AR_UP_Ctrl_DHT_NoProm_No5UTR.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 1500 -b 1500 \
+--missingDataAsZero \
+-out try6.tab.gz \
+--verbose 
+  
+  plotProfile -m  try6.tab.gz \
+ -out Control_H3K4me2_signal_at_AR_enhancers.v7.pdf \
+ --perGroup \
+ --averageType median \
+ --yMin 0 \
+ --yMax 3 \
+ --colors blue orange \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+  plotProfile -m  try6.tab.gz \
+ -out Control_H3K4me2_signal_at_AR_enhancers.v8.pdf \
+ --perGroup \
+ --yMin 3 \
+ --yMax 18 \
+ --colors orange blue \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+
+
+computeMatrix reference-point \
+-S 16.pval.signal.bigwig 13.pval.signal.bigwig \
+-R Annotated_ARE_AR_UP_Ctrl_DHT_NoProm_No5UTR.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 1500 -b 1500 \
+--missingDataAsZero \
+-out try7.tab.gz \
+--verbose 
+
+ plotProfile -m  try7.tab.gz \
+ -out SPOPmut_H3K4me2_signal_at_AR_enhancers.v5.pdf \
+ --perGroup \
+ --colors red green \
+ --averageType median \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+  plotProfile -m  try7.tab.gz \
+ -out SPOPmut_H3K4me2_signal_at_AR_enhancers.v6.pdf \
+ --perGroup \
+ --yMin 3 \
+ --yMax 18 \
+ --colors green red \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+CONCLUSIONS: I get expected results whne I plot output of encode pipeline that is p value bigwigs 
+As well as when the statistics is median and not the default mean
+So to the paper I will place histograms: 
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/signal_at_AR_enhancers/SPOPmut_H3K4me2_signal_at_AR_enhancers.v5.pdf
+ /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/signal_at_AR_enhancers/Control_H3K4me2_signal_at_AR_enhancers.v7.pdf 
+#they are  a little bit lumpy
+
+~~~~~~~~~what if I plot just all the peaks - not only the ones at the enhancers (koristim p value bigwigs and median value statistics)
+
+#NOT GOOD
+
+Control_enriched.bed SPOPmut_enriched.bed
+
+computeMatrix reference-point \
+-S 4.pval.signal.bigwig 1.pval.signal.bigwig \
+-R Control_enriched.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 1500 -b 1500 \
+--missingDataAsZero \
+-out try8.tab.gz \
+--verbose 
+ 
+ plotProfile -m  try8.tab.gz \
+ -out Control_H3K4me2_signal_at_AR_enhancers.v9.pdf \
+ --perGroup \
+ --averageType median \
+ --colors orange blue \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+computeMatrix reference-point \
+-S 16.pval.signal.bigwig 13.pval.signal.bigwig \
+-R SPOPmut_enriched.bed \
+--sortUsingSamples 1 \
+--sortRegions descend \
+--referencePoint center \
+-a 1500 -b 1500 \
+--missingDataAsZero \
+-out try9.tab.gz \
+--verbose 
+
+ plotProfile -m  try7.tab.gz \
+ -out SPOPmut_H3K4me2_signal_at_AR_enhancers.v7.pdf \
+ --perGroup \
+ --colors green red \
+ --averageType median \
+ --plotTitle "H3K4me2_signal_at_AR" \
+ --verbose
+
+
+
+
+~~~~~Sredila H3K4me2 Ctrl (DHT)
+
+cd /Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/CONTROL_DHT
+Control_consensus_DHT.txt 65739 peaks
+
+annotatePeaks.pl Control_consensus_DHT.txt   mm10 -go GO_Control_consensus -genomeOntology genome_Control_consensus -annStats Stats_Control_consensus > Annotated_H3K4me2_Control_DHT_consensus.bed
+wc -l Annotated_H3K4me2_Control_DHT_consensus.bed
+65740 Annotated_H3K4me2_Control_DHT_consensus.bed
+
+cat Annotated_H3K4me2_Control_DHT_consensus.bed |awk 'BEGIN {FS="\t"; OFS="\t"} {if ($8!~"promoter-TSS" && $8!~"^5") {print $0}}' | cut -f 2,3,4,5 | sed 1d | sort -k1,1 -k2,2n > H3K4me2_ChIP_Control_consensus_DHT_NoProm_No5UTR.bed
+(deeptools) MAC202969:CONTROL_DHT ivana$ wc -l H3K4me2_ChIP_Control_consensus_DHT_NoProm_No5UTR.bed
+   58649 H3K4me2_ChIP_Control_consensus_DHT_NoProm_No5UTR.bed
+
+annotatePeaks.pl H3K4me2_ChIP_Control_consensus_DHT_NoProm_No5UTR.bed mm10 -center  /Volumes/Seagate/AR_2019/HOMER_consensus_peaks/Control/peakAnalysis/knownResults/known11.motif   > ARE_H3K4me2_ChIP_Control_consensus_DHT_NoProm_No5UTR.bed
+Total Peaks/Regions:     58649
+Total Peaks re-centered: 10445
+
+head ARE_H3K4me2_ChIP_Control_consensus_DHT_NoProm_No5UTR.bed
+
+cut -f 2,3,4 ARE_H3K4me2_ChIP_Control_consensus_DHT_NoProm_No5UTR.bed | sed 1d | sort -V -k1,1 -k2,2 > ARE_H3K4me2_ChIP_Control_consensus_DHT_enhancers.bed
+
+/Volumes/Seagate/H3K4me2_mouse_organoids_Nov2018/Encode_pipeline_mm10/DIFFBIND_CONSENSUS/CONTROL_DHT
