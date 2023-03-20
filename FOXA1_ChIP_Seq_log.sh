@@ -5,12 +5,9 @@ FOXA1_ChIP_Seq
 #3) sa curie na panda - taj node je jedini slobodan za nas
 
 
-
-ssh ivg2005@pascal.med.cornell.edu
-IvanaGrbesa1981@
-
-ssh ivg2005@curie.pbtech
-IvanaGrbesa1981@
+ssh ivg...@pascal.pbtech
+ssh ivg...@curie.pbtech
+pass
 
 Starting an interactive session:
 srun -n1 --pty --partition=panda --mem=100G bash -i
@@ -27,11 +24,6 @@ ivg2005@node102 ~/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-p
 $ cd FOXA1
 
 Transfer fastq files to that directory:
-server ip: gc-sftp.med.cornell.edu (sftp connection )
-username: Guest1
-password: Wjr9HZ
-
-Ivanna7411_2019_06_03
 
 ivg2005@node102 ~/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-pipeline2/FOXA1
 $ sftp Guest1@gc-sftp.med.cornell.edu
@@ -216,7 +208,7 @@ FOXA1_Control_DHT.json	FOXA1_Control_EtOH.json	FOXA1_SPOPmut_DHT.json	FOXA1_SPOP
 
 scp *.json ivg2005@pascal.med.cornell.edu:/home/ivg2005/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-pipeline2/examples/local
 
-IvanaGrbesa1981@
+pass
 scp FOXA1_SPOPmut_DHT.json ivg2005@pascal.med.cornell.edu:/home/ivg2005/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-pipeline2/examples/local
 
 
@@ -224,10 +216,10 @@ scp FOXA1_SPOPmut_DHT.json ivg2005@pascal.med.cornell.edu:/home/ivg2005/barbieri
 
 #allocate 100G of space:
 
-ssh ivg2005@pascal.med.cornell.edu
-IvanaGrbesa1981@
+ssh ivg...@pascal.med.cornell.edu
+pass
 
-ssh ivg2005@curie.pbtech
+ssh ivg2=...@curie.pbtech
 
 Starting an interactive session:
 srun -n1 --pty --partition=panda --mem=100G bash -i
@@ -265,27 +257,22 @@ java -jar -Dconfig.file=backends/backend.conf cromwell-34.jar run chip.wdl -i ${
 cd /Volumes/Seagate/FOXA1_2019/ENCODE_PIPELINE
 mkdir FOXA1_Control_DHT 
 scp -r ivg2005@pascal.med.cornell.edu:/home/ivg2005/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-pipeline2/cromwell-executions/chip/9432f488-206f-4cc0-8a4b-0bfd615970da .
-IvanaGrbesa1981@
+pass
 
 #New Terminal Window
 cd /Volumes/Seagate/FOXA1_2019/ENCODE_PIPELINE
 mkdir FOXA1_SPOPmut_EtOH 
 scp -r ivg2005@pascal.med.cornell.edu:/home/ivg2005/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-pipeline2/cromwell-executions/chip/61f3ae3c-a94a-4d92-a173-74f6c9af10d9 .
-IvanaGrbesa1981@
+
 
 #New Terminal Window
 cd /Volumes/Seagate/FOXA1_2019/ENCODE_PIPELINE
 mkdir FOXA1_Control_EtOH
 scp -r ivg2005@pascal.med.cornell.edu:/home/ivg2005/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-pipeline2/cromwell-executions/chip/f2e5a9e4-67f0-4520-b814-bfe068011dca . 
-IvanaGrbesa1981@
 
-#nesto ne valja sa SPOPmut_DHT
-scp -r ivg2005@pascal.med.cornell.edu:/home/ivg2005/barbierilab_store_ivg2005/encode-chip-seq-pipeline2/chip-seq-pipeline2/cromwell-executions/chip/39c7b93e-ff4b-4fbd-b8a6-5c102a865d27 . 
-IvanaGrbesa1981@
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Replicate concordance~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-vidi QC 
+QC 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DeepTools~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 source activate bioinfo
@@ -317,9 +304,6 @@ multiBamSummary bins \
 --verbose \
 -o multiBamSummary_results.npz --outRawCounts readCounts.tab
 
-##dakle ostavila sam bin 10kb ipak to je misji genom, specificirala sam bam fajlove koji imaju u istom folderu i indeksirane bam fajlove tj bai, zatim min maping quality da je 30, da ignorira duplikate ako ih ima, da specificira oznake - kasnije bitno kad izradjujes heatmaps i PCA plots, zatim verbose da mi kaze sto radi i outpute
-
-#davao je error: The index file is older than the data file: 4.bam.bai no nastavio e raditi
 
 
 
@@ -337,11 +321,10 @@ plotCorrelation \
 -o heatmap_Sperman_readCounts.eps \
 --outFileCorMatrix SpearmanCorr_readCounts.tab
 
-#ok uzorci nisu zamijenjeni, sve je kao po spagi
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Genome Browser session~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Bigwig: fold over control for each replica
 
-#fajlovi:
+#files:
 /Volumes/Seagate/FOXA1_2019/ENCODE_PIPELINE/FOXA1_Control_EtOH/call-macs2/shard-0/execution/4_S3_R1_001.merged.nodup_x_ctl_for_rep1.fc.signal.bigwig
 /Volumes/Seagate/FOXA1_2019/ENCODE_PIPELINE/FOXA1_Control_EtOH/call-macs2/shard-1/execution/6_S4_R1_001.merged.nodup_x_ctl_for_rep2.fc.signal.bigwig
 /Volumes/Seagate/FOXA1_2019/ENCODE_PIPELINE/FOXA1_Control_DHT/Ctrl_DHT/call-macs2/shard-0/execution/10_S7_R1_001.merged.nodup_x_ctl_for_rep1.fc.signal.bigwig
@@ -354,7 +337,7 @@ plotCorrelation \
 #uploadaj na Amazon server:
 https://aws.amazon.com/s3/
 
-#zasebno replike:
+#replicas and merged peaks separately:
 track color=255,0,0 name="Control(EtOH).rep1" description="mouse prostate organoids FOXA1_Control(EtOH).rep1" type=bigWig visibility=full bigDataUrl=https://androgenreceptorchip.s3.us-east-2.amazonaws.com/4.bigwig
 track color=255,0,0 name="Control(EtOH).rep2" description="mouse prostate organoids FOXA1_Control(EtOH).rep2" type=bigWig visibility=full bigDataUrl=https://androgenreceptorchip.s3.us-east-2.amazonaws.com/6.bigwig
 
@@ -374,10 +357,9 @@ mm10
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~IDR peaks~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Preskocila i uzela IDR peaks
+IDR peaks
 
-#Nemoj gledati sve peaks called by MACS nego optimal IDR peaks
-#na qc_html report: Reproducibility QC and peak detection statistics: 
+#qc_html report: Reproducibility QC and peak detection statistics: 
 #Nt: True Replicate consisten overlapping peaks (comparing true replicates Rep1 vs Rep2 
 
 # /Volumes/Seagate/FOXA1_2019/ENCODE_PIPELINE/FOXA1_Control_EtOH/call-idr/shard-0/execution/rep1-rep2.idr0.05.bfilt.narrowPeak 
@@ -487,7 +469,7 @@ findMotifsGenome.pl FOXA1_SPOPmut_DHT.narrowPeak mm10r peakAnalysis -size 200
 FOXA1_SPOPmut_EtOH.narrowPeak
 findMotifsGenome.pl FOXA1_SPOPmut_EtOH.narrowPeak mm10r peakAnalysis -size 200 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Incidence of FOXA1 motif in samples~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Incidence of FOXA1 motif in samples~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cd /Volumes/Seagate/FOXA1_2019/FOXA1_MOTIF_INCIDENCE
 
@@ -505,13 +487,7 @@ annotatepeaks.pl FOXA1_SPOPmut_DHT.narrowPeak.bed.sorted.bed  mm10 -size 1000 -h
 annotatepeaks.pl FOXA1_SPOPmut_EtOH.narrowPeak.bed.sorted.bed  mm10 -size 1000 -hist 5 -m /Volumes/Seagate/FOXA1_2019/Homer_motifs/SPOPmut_DHT/peakAnalysis/knownResults/known1.motif > FOXA1_SPOPmut_EtOH.bed 
 
 
-#sve skup au jedan excell file pa u Prism
-
-
-Mozda bi trebala intersect sa AR peaks koje sam izanalizirala prije i onda napraviti istu analizu - napravila u DeepTools
-
-
-
+#viz: GraphPad Prism
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Intervene: heatmap~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #overlap between H3K4me2, Ar and FOXA1?
@@ -713,7 +689,7 @@ pybedtools venn_mpl -a AR_SPOPmut.narrowPeak.bed.sorted.bed  -b FOXA1_SPOPmut_Et
    34969 FOXA1_SPOPmut_DHT.narrowPeak.bed.sorted.bed
 
 
-~~~~~~~~~~~~~~~~~~~~~~CREATE A HEATMAP - CENTERED PEAKS NA FOXA1 MOTIF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~CREATE A HEATMAP - CENTERED PEAKS at FOXA1 MOTIF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #with DeepTools
 
 cd /Volumes/Seagate/FOXA1_2019/Heatmap
@@ -751,7 +727,7 @@ computeMatrix reference-point \
 
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~FOXA1 signla na AR peaks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~FOXA1 signla on AR peaks
  #2 plots: 
 regije su: AR specific peaks u kontroli: UP_Control.txt (nisam centrirala peakove na FOXA1 motif no mozda bi trebala)
 
@@ -1434,7 +1410,7 @@ plotHeatmap \
  --sortRegions no \
  --verbose  
 
-#ovo neka ide u supplementary
+#supplementary
 
 
 
